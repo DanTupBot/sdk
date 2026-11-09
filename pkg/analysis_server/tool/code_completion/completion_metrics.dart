@@ -893,9 +893,13 @@ class CompletionQualityMetricsComputer extends CompletionMetricsComputer {
       required CompletionMetrics metrics,
     }) async {
       var stopwatch = Stopwatch()..start();
+      var offset = expectedCompletion.offset;
+      if (expectedCompletion.syntacticEntity.length >= options.prefixLength) {
+        offset += options.prefixLength;
+      }
       var request = DartCompletionRequest.forResolvedUnit(
         resolvedUnit: resolvedUnitResult,
-        offset: expectedCompletion.offset,
+        offset: offset,
       );
 
       var opType = OpType.forCompletion(request.target, request.offset);
