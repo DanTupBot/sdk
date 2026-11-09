@@ -11,6 +11,7 @@ import 'dart:math' as math;
 import 'package:analysis_server/src/protocol_server.dart'
     as protocol
     show ElementKind;
+import 'package:analysis_server/src/services/completion/dart/probability_range.dart';
 import 'package:analysis_server/src/services/completion/dart/relevance_tables.g.dart';
 import 'package:analysis_server/src/utilities/extensions/element.dart';
 import 'package:analysis_server/src/utilities/extensions/numeric.dart';
@@ -34,6 +35,17 @@ const int maximumRelevance = 1000;
 
 /// Whether to use the generated relevance tables when computing relevance.
 bool useRelevanceTables = true;
+
+/// When [useRelevanceTables] is `false`, whether to still return the
+/// `distance` sub-feature (`inheritanceDistance` / `localVariableDistance`)
+/// from [FeatureComputer.elementKindFeature].
+bool preserveDistanceWithoutTables = false;
+
+/// When [useRelevanceTables] is `false`, whether to use a uniform
+/// `ProbabilityRange(lower: 0.0, upper: 1.0)` for all element kinds and
+/// keywords so the tables have zero net effect on kind/keyword rank while
+/// still scaling `distance`.
+bool useUniformRelevanceRanges = false;
 
 /// Whether to compute relevance scores at all.
 bool useRelevanceScores = true;
@@ -334,6 +346,16 @@ class FeatureComputer {
     double? distance,
   }) {
     if (!useRelevanceTables) {
+      if (useUniformRelevanceRanges) {
+        const uniformRange = ProbabilityRange(lower: 0.0, upper: 1.0);
+        if (distance == null) {
+          return uniformRange.middle;
+        }
+        return uniformRange.conditionalProbability(distance);
+      }
+      if (preserveDistanceWithoutTables) {
+        return distance ?? 0.0;
+      }
       return 0.0;
     }
     if (completionLocation == null) {
@@ -425,6 +447,9 @@ class FeatureComputer {
   /// completing at the given [completionLocation].
   double keywordFeature(String keyword, String? completionLocation) {
     if (!useRelevanceTables) {
+      if (useUniformRelevanceRanges) {
+        return 0.5;
+      }
       return 0.0;
     }
     if (completionLocation == null) {

@@ -861,6 +861,32 @@ class CompletionQualityMetricsComputer extends CompletionMetricsComputer {
     );
     targetMetrics.add(
       CompletionMetrics(
+        'no tables (uniform)',
+        enableFunction: () {
+          useRelevanceTables = false;
+          useUniformRelevanceRanges = true;
+        },
+        disableFunction: () {
+          useRelevanceTables = true;
+          useUniformRelevanceRanges = false;
+        },
+      ),
+    );
+    targetMetrics.add(
+      CompletionMetrics(
+        'no tables (distance)',
+        enableFunction: () {
+          useRelevanceTables = false;
+          preserveDistanceWithoutTables = true;
+        },
+        disableFunction: () {
+          useRelevanceTables = true;
+          preserveDistanceWithoutTables = false;
+        },
+      ),
+    );
+    targetMetrics.add(
+      CompletionMetrics(
         'no relevance',
         enableFunction: () => useRelevanceScores = false,
         disableFunction: () => useRelevanceScores = true,
