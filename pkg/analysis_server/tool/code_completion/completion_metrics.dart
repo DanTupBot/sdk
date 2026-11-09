@@ -852,6 +852,20 @@ class CompletionQualityMetricsComputer extends CompletionMetricsComputer {
     // To compare two or more changes to completions, add a `CompletionMetrics`
     // object with enable and disable functions to the list of `targetMetrics`.
     targetMetrics.add(CompletionMetrics('shipping'));
+    targetMetrics.add(
+      CompletionMetrics(
+        'no tables',
+        enableFunction: () => useRelevanceTables = false,
+        disableFunction: () => useRelevanceTables = true,
+      ),
+    );
+    targetMetrics.add(
+      CompletionMetrics(
+        'no relevance',
+        enableFunction: () => useRelevanceScores = false,
+        disableFunction: () => useRelevanceScores = true,
+      ),
+    );
 
     // To compare two or more relevance tables, uncomment the line below and
     // add the `RelevanceTables` to the list. The default relevance tables

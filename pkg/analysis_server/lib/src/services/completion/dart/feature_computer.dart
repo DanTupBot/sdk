@@ -32,6 +32,12 @@ const List<String> listNames = ['list', 'items'];
 /// The maximum relevance score a completion can have.
 const int maximumRelevance = 1000;
 
+/// Whether to use the generated relevance tables when computing relevance.
+bool useRelevanceTables = true;
+
+/// Whether to compute relevance scores at all.
+bool useRelevanceScores = true;
+
 const List<String> numNames = ['height', 'width'];
 
 const List<String> stringNames = [
@@ -327,6 +333,9 @@ class FeatureComputer {
     String? completionLocation, {
     double? distance,
   }) {
+    if (!useRelevanceTables) {
+      return 0.0;
+    }
     if (completionLocation == null) {
       return 0.0;
     }
@@ -415,6 +424,9 @@ class FeatureComputer {
   /// Return the value of the _keyword_ feature for the [keyword] when
   /// completing at the given [completionLocation].
   double keywordFeature(String keyword, String? completionLocation) {
+    if (!useRelevanceTables) {
+      return 0.0;
+    }
     if (completionLocation == null) {
       return 0.0;
     }
